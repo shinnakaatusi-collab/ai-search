@@ -1,6 +1,6 @@
 // GitHub Pages のベースURL（デプロイ後に変更してください）
 // 例: https://<username>.github.io/ai-search/reports
-export const API_BASE_URL = 'https://chibichan0307.github.io/ai-search/reports';
+export const API_BASE_URL = 'https://shinnakaatusi-collab.github.io/ai-search/reports';
 
 // ローカル開発用（Expo GoでPC上のサーバーにアクセスする場合）
 // export const API_BASE_URL = 'http://192.168.x.x:8080/reports';
