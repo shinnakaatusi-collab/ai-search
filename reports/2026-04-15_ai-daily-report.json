@@ -1,0 +1,126 @@
+{
+  "date": "2026-04-15",
+  "generated_at": "2026-04-15T08:00:00+09:00",
+  "highlight": "OpenAIが新モデルGPT-5 Turboを発表、マルチモーダル性能が大幅向上",
+  "categories": [
+    {
+      "id": "research",
+      "name": "研究・技術",
+      "icon": "🔬",
+      "items": [
+        {
+          "title": "GPT-5 Turbo発表: マルチモーダル推論が飛躍的に向上",
+          "summary": "OpenAIがGPT-5 Turboを発表。画像・音声・動画の統合理解が大幅に改善され、複雑な推論タスクでのベンチマークスコアが前世代比40%向上した。",
+          "source": "TechCrunch",
+          "url": "https://example.com/gpt5-turbo",
+          "background": "GPT-4oの登場以降、マルチモーダルAIの競争が激化。Google Gemini、Anthropic Claudeとの三つ巴の状況が続いていた。",
+          "prediction_short": "他社も3ヶ月以内に対抗モデルを発表する可能性が高い。API価格競争がさらに加速する見込み。",
+          "prediction_long": "マルチモーダルAIが標準となり、テキストのみのモデルは淘汰される方向。エッジデバイスでの動作も視野に。",
+          "impact_level": "high",
+          "tags": ["LLM", "マルチモーダル", "OpenAI"]
+        },
+        {
+          "title": "Meta、オープンソースLLM「Llama 4」の学術向け拡張版を公開",
+          "summary": "MetaがLlama 4の128K コンテキスト対応の学術研究向けバージョンを公開。論文要約・データ分析に特化したファインチューニング済み。",
+          "source": "VentureBeat",
+          "url": "https://example.com/llama4-academic",
+          "background": "Llama 3の成功以降、Metaはオープンソース戦略を強化。学術コミュニティとの連携を重視している。",
+          "prediction_short": "学術機関での採用が急速に進み、研究論文でのLlama活用事例が増加する見込み。",
+          "prediction_long": "オープンソースLLMのエコシステムがさらに成熟し、商用モデルとの性能差が縮小していく。",
+          "impact_level": "medium",
+          "tags": ["オープンソース", "Meta", "学術"]
+        }
+      ]
+    },
+    {
+      "id": "business",
+      "name": "企業・ビジネス",
+      "icon": "🏢",
+      "items": [
+        {
+          "title": "AI医療スタートアップMedAI、シリーズCで5億ドル調達",
+          "summary": "医療画像診断AIのMedAIがシリーズCラウンドで5億ドルを調達。FDA認可済み製品の拡大と欧州展開に充当予定。",
+          "source": "Bloomberg",
+          "url": "https://example.com/medai-funding",
+          "background": "AI医療分野は2025年から投資が急増。特に画像診断・創薬分野でのAI活用が実用段階に入っている。",
+          "prediction_short": "医療AI分野での大型調達が続き、IPOを目指す企業が増える見込み。",
+          "prediction_long": "AI診断が医療の標準ワークフローに組み込まれ、規制フレームワークの整備が進む。",
+          "impact_level": "medium",
+          "tags": ["医療AI", "資金調達", "スタートアップ"]
+        }
+      ]
+    },
+    {
+      "id": "regulation",
+      "name": "規制・政策",
+      "icon": "📜",
+      "items": [
+        {
+          "title": "EU AI Act第2フェーズの施行ガイドライン草案が公開",
+          "summary": "欧州委員会がEU AI Actの高リスクAIシステムに関する詳細な施行ガイドライン草案を公開。コンプライアンス要件の具体化が進む。",
+          "source": "Reuters",
+          "url": "https://example.com/eu-ai-act-phase2",
+          "background": "2024年に成立したEU AI Actは段階的に施行中。汎用AIモデルへの規制が2025年から適用開始されている。",
+          "prediction_short": "企業のコンプライアンス対応コストが増加。AI監査サービスの需要が急増する見込み。",
+          "prediction_long": "EUの規制がグローバルスタンダードとなり、他国も類似の法規制を整備する流れが加速。",
+          "impact_level": "high",
+          "tags": ["EU", "規制", "コンプライアンス"]
+        }
+      ]
+    },
+    {
+      "id": "tools",
+      "name": "ツール・プロダクト",
+      "icon": "🛠️",
+      "items": [
+        {
+          "title": "GitHub Copilot Workspace、マルチリポジトリ対応を発表",
+          "summary": "GitHub Copilot Workspaceが複数リポジトリをまたいだコード生成・リファクタリング機能を追加。大規模プロジェクトでの開発効率向上を目指す。",
+          "source": "GitHub Blog",
+          "url": "https://example.com/copilot-workspace-multi",
+          "background": "AI支援開発ツールの競争が激化。Cursor、Windsurf等の新興ツールがシェアを伸ばしている中、GitHubが機能強化で対抗。",
+          "prediction_short": "開発者向けAIツール市場でのシェア争いが激化。差別化ポイントが「コード生成」から「ワークフロー統合」にシフト。",
+          "prediction_long": "AI開発ツールがIDE自体を再定義し、従来のテキストエディタベースの開発スタイルが変化していく。",
+          "impact_level": "medium",
+          "tags": ["開発ツール", "GitHub", "コーディング支援"]
+        }
+      ]
+    },
+    {
+      "id": "society",
+      "name": "社会・倫理",
+      "icon": "🌍",
+      "items": [
+        {
+          "title": "AIによる雇用影響レポート: 2026年上半期の動向",
+          "summary": "McKinseyが発表した最新レポートによると、AI導入により定型業務の30%が自動化される一方、AI関連の新職種が前年比45%増加している。",
+          "source": "McKinsey",
+          "url": "https://example.com/mckinsey-ai-employment",
+          "background": "2024-2025年にかけてAIによる業務自動化が本格化。特にカスタマーサービス、データ入力、翻訳分野での影響が顕著。",
+          "prediction_short": "企業のAIリスキリング投資が増加。AI人材の需給ギャップは依然として拡大傾向。",
+          "prediction_long": "AIと人間の協業モデルが確立され、「AIネイティブ」な働き方が主流に。教育システムの変革も進む。",
+          "impact_level": "high",
+          "tags": ["雇用", "自動化", "リスキリング"]
+        }
+      ]
+    },
+    {
+      "id": "market",
+      "name": "市場・トレンド",
+      "icon": "📊",
+      "items": [
+        {
+          "title": "エッジAI市場が2026年に急成長、前年比60%増の見込み",
+          "summary": "Gartnerの予測によると、エッジデバイス上でのAI推論市場が急成長。スマートフォン、IoTデバイスでのオンデバイスAI需要が牽引。",
+          "source": "Gartner",
+          "url": "https://example.com/edge-ai-growth",
+          "background": "クラウドAIの処理コストとレイテンシの課題から、エッジAIへの関心が高まっている。Apple、Qualcommがチップレベルでの最適化を推進。",
+          "prediction_short": "主要スマホメーカーがエッジAI機能を差別化ポイントとして強化。専用チップの競争が激化。",
+          "prediction_long": "エッジとクラウドのハイブリッドAIアーキテクチャが主流に。プライバシー重視のローカル処理需要が拡大。",
+          "impact_level": "medium",
+          "tags": ["エッジAI", "IoT", "市場予測"]
+        }
+      ]
+    }
+  ]
+}
