@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>AI Daily News</title>
+<style>
+  :root {
+    --bg: #111827; --surface: #1F2937; --surface2: #374151;
+    --text: #F9FAFB; --text2: #D1D5DB; --text3: #9CA3AF;
+    --accent: #6366F1; --accent-bg: #1E1B4B;
+    --red: #EF4444; --amber: #F59E0B; --emerald: #10B981;
+    --blue: #3B82F6; --violet: #8B5CF6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100dvh; padding: 20px 16px 40px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .highlight {
+    background: var(--accent-bg); border-radius: 16px;
+    padding: 18px 20px; margin-bottom: 24px;
+  }
+  .highlight-label {
+    color: #818CF8; font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; margin-bottom: 6px;
+  }
+  .highlight-text { color: #E0E7FF; font-size: 15px; font-weight: 600; line-height: 1.5; }
+  .date { color: var(--text3); font-size: 13px; margin-bottom: 14px; }
+  .section-title { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+
+  /* Category Cards */
+  .cat-card {
+    background: var(--surface); border-radius: 12px; padding: 14px 16px;
+    margin-bottom: 10px; display: flex; align-items: center;
+    justify-content: space-between; cursor: pointer;
+    border-left: 4px solid var(--accent); transition: opacity 0.15s;
+  }
+  .cat-card:active { opacity: 0.7; }
+  .cat-left { display: flex; align-items: center; gap: 10px; }
+  .cat-icon { font-size: 22px; }
+  .cat-name { font-size: 15px; font-weight: 600; }
+  .cat-count { color: var(--text3); font-size: 13px; }
+
+  /* Category detail view */
+  .view { display: none; }
+  .view.active { display: block; }
+  .back-btn {
+    background: none; border: none; color: var(--accent);
+    font-size: 14px; cursor: pointer; padding: 8px 0; margin-bottom: 12px;
+  }
+  .cat-header { text-align: center; margin-bottom: 20px; }
+  .cat-header-icon { font-size: 36px; }
+  .cat-header-name { font-size: 20px; font-weight: 700; margin-top: 4px; }
+  .cat-header-count { color: var(--text3); font-size: 13px; }
+
+  /* News Item */
+  .news-card {
+    background: var(--surface); border-radius: 12px;
+    padding: 16px; margin-bottom: 12px; cursor: pointer; transition: opacity 0.15s;
+  }
+  .news-card:active { opacity: 0.7; }
+  .news-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .badge {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px;
+  }
+  .badge-high { background: #EF444420; color: var(--red); }
+  .badge-medium { background: #F59E0B20; color: var(--amber); }
+  .badge-low { background: #6B728020; color: var(--text3); }
+  .news-source { color: var(--text3); font-size: 12px; }
+  .news-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
+  .news-summary { color: var(--text2); font-size: 13px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tag { background: var(--surface2); color: var(--text3); font-size: 11px; padding: 3px 8px; border-radius: 12px; }
+
+  /* Detail view */
+  .detail-impact { display: inline-block; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin-bottom: 12px; }
+  .detail-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 6px; }
+  .detail-source { color: var(--text3); font-size: 13px; margin-bottom: 20px; }
+  .detail-section { margin-bottom: 20px; }
+  .detail-label { color: var(--text3); font-size: 12px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .detail-body { color: var(--text2); font-size: 14px; line-height: 1.6; }
+  .pred-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+  .pred-card {
+    background: var(--surface); border-radius: 12px; padding: 16px;
+    margin-bottom: 12px; border-left: 4px solid var(--blue);
+  }
+  .pred-card.long { border-left-color: var(--violet); }
+  .pred-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .pred-label { font-size: 13px; font-weight: 700; }
+  .pred-period { color: var(--text3); font-size: 12px; }
+  .pred-content { color: var(--text2); font-size: 14px; line-height: 1.6; }
+  .link-btn {
+    display: block; text-align: center; background: var(--accent);
+    color: #fff; border: none; border-radius: 12px; padding: 14px;
+    font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none;
+    margin-top: 8px;
+  }
+
+  .loading { text-align: center; padding: 60px 0; color: var(--text3); }
+  .error { text-align: center; padding: 60px 0; color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- Home -->
+<div id="home-view" class="view active">
+  <div id="home-content"></div>
+</div>
+
+<!-- Category -->
+<div id="cat-view" class="view">
+  <button class="back-btn" onclick="showHome()">&larr; ホーム</button>
+  <div id="cat-content"></div>
+</div>
+
+<!-- Detail -->
+<div id="detail-view" class="view">
+  <button class="back-btn" onclick="showCategory(currentCatIndex)">&larr; 一覧に戻る</button>
+  <div id="detail-content"></div>
+</div>
+
+<script>
+const BASE = './reports';
+let report = null;
+let currentCatIndex = 0;
+
+const COLORS = {
+  research: '#6366F1', business: '#F59E0B', regulation: '#EF4444',
+  tools: '#10B981', society: '#8B5CF6', market: '#3B82F6'
+};
+const BADGE = {
+  high: { label: '重要', cls: 'badge-high' },
+  medium: { label: '注目', cls: 'badge-medium' },
+  low: { label: '参考', cls: 'badge-low' }
+};
+
+async function init() {
+  const home = document.getElementById('home-content');
+  home.innerHTML = '<div class="loading">読み込み中...</div>';
+  try {
+    const idx = await (await fetch(`${BASE}/index.json`)).json();
+    const latest = idx.reports[idx.reports.length - 1];
+    report = await (await fetch(`${BASE}/${latest.file}`)).json();
+    renderHome();
+  } catch (e) {
+    home.innerHTML = `<div class="error">データの取得に失敗しました</div>`;
+  }
+}
+
+function renderHome() {
+  const r = report;
+  let html = `
+    <div class="date">${r.date}</div>
+    <div class="highlight">
+      <div class="highlight-label">TODAY'S HIGHLIGHT</div>
+      <div class="highlight-text">${r.highlight}</div>
+    </div>
+    <div class="section-title">カテゴリ</div>
+  `;
+  r.categories.forEach((cat, i) => {
+    const color = COLORS[cat.id] || '#6B7280';
+    html += `
+      <div class="cat-card" style="border-left-color:${color}" onclick="showCategory(${i})">
+        <div class="cat-left">
+          <span class="cat-icon">${cat.icon}</span>
+          <span class="cat-name">${cat.name}</span>
+        </div>
+        <span class="cat-count">${cat.items.length}件</span>
+      </div>`;
+  });
+  document.getElementById('home-content').innerHTML = html;
+}
+
+function showHome() {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('home-view').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showCategory(idx) {
+  currentCatIndex = idx;
+  const cat = report.categories[idx];
+  const color = COLORS[cat.id] || '#6B7280';
+  let html = `
+    <div class="cat-header">
+      <div class="cat-header-icon">${cat.icon}</div>
+      <div class="cat-header-name" style="color:${color}">${cat.name}</div>
+      <div class="cat-header-count">${cat.items.length}件のニュース</div>
+    </div>`;
+  cat.items.forEach((item, i) => {
+    const b = BADGE[item.impact_level] || BADGE.low;
+    html += `
+      <div class="news-card" onclick="showDetail(${idx},${i})">
+        <div class="news-top">
+          <span class="badge ${b.cls}">${b.label}</span>
+          <span class="news-source">${item.source}</span>
+        </div>
+        <div class="news-title">${item.title}</div>
+        <div class="news-summary">${item.summary}</div>
+        <div class="tags">${item.tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      </div>`;
+  });
+  document.getElementById('cat-content').innerHTML = html;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('cat-view').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showDetail(catIdx, itemIdx) {
+  currentCatIndex = catIdx;
+  const item = report.categories[catIdx].items[itemIdx];
+  const b = BADGE[item.impact_level] || BADGE.low;
+  const html = `
+    <div class="detail-impact ${b.cls}">${b.label === '重要' ? '重要度: 高' : b.label === '注目' ? '重要度: 中' : '重要度: 低'}</div>
+    <div class="detail-title">${item.title}</div>
+    <div class="detail-source">${item.source}</div>
+    <div class="detail-section">
+      <div class="detail-label">概要</div>
+      <div class="detail-body">${item.summary}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-label">背景・経緯</div>
+      <div class="detail-body">${item.background}</div>
+    </div>
+    <div class="pred-title">トレンド予測</div>
+    <div class="pred-card">
+      <div class="pred-header">
+        <span class="pred-label" style="color:var(--blue)">短期予測</span>
+        <span class="pred-period">1〜3ヶ月</span>
+      </div>
+      <div class="pred-content">${item.prediction_short}</div>
+    </div>
+    <div class="pred-card long">
+      <div class="pred-header">
+        <span class="pred-label" style="color:var(--violet)">中長期予測</span>
+        <span class="pred-period">半年〜1年</span>
+      </div>
+      <div class="pred-content">${item.prediction_long}</div>
+    </div>
+    <div class="tags" style="margin-bottom:20px">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    <a class="link-btn" href="${item.url}" target="_blank" rel="noopener">元記事を開く</a>
+  `;
+  document.getElementById('detail-content').innerHTML = html;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('detail-view').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+init();
+</script>
+</body>
+</html>
