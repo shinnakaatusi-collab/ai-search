@@ -5,123 +5,288 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23111827' width='100' height='100' rx='20'/><text x='50' y='68' text-anchor='middle' font-size='50'>AI</text></svg>">
 <title>AI Daily News</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
   :root {
-    --bg: #111827; --surface: #1F2937; --surface2: #374151;
-    --text: #F9FAFB; --text2: #D1D5DB; --text3: #9CA3AF;
-    --accent: #6366F1; --accent-bg: #1E1B4B;
-    --red: #EF4444; --amber: #F59E0B; --emerald: #10B981;
-    --blue: #3B82F6; --violet: #8B5CF6;
+    --bg: #0A0F1A; --surface: rgba(255,255,255,0.05); --surface-hover: rgba(255,255,255,0.08);
+    --glass: rgba(255,255,255,0.03); --glass-border: rgba(255,255,255,0.08);
+    --text: #F1F5F9; --text2: #CBD5E1; --text3: #64748B;
+    --accent: #818CF8; --accent2: #6366F1; --accent-glow: rgba(99,102,241,0.15);
+    --red: #F87171; --amber: #FBBF24; --emerald: #34D399;
+    --blue: #60A5FA; --violet: #A78BFA; --rose: #FB7185;
+    --radius: 16px; --radius-sm: 10px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg); color: var(--text);
-    min-height: 100dvh; padding: 20px 16px 40px;
-    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh; -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
-  .highlight {
-    background: var(--accent-bg); border-radius: 16px;
-    padding: 18px 20px; margin-bottom: 24px;
-  }
-  .highlight-label {
-    color: #818CF8; font-size: 11px; font-weight: 700;
-    letter-spacing: 1px; margin-bottom: 6px;
-  }
-  .highlight-text { color: #E0E7FF; font-size: 15px; font-weight: 600; line-height: 1.5; }
-  .date { color: var(--text3); font-size: 13px; margin-bottom: 14px; }
-  .section-title { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+  .page { padding: 0 16px 40px; max-width: 480px; margin: 0 auto; }
 
-  /* Category Cards */
-  .cat-card {
-    background: var(--surface); border-radius: 12px; padding: 14px 16px;
-    margin-bottom: 10px; display: flex; align-items: center;
-    justify-content: space-between; cursor: pointer;
-    border-left: 4px solid var(--accent); transition: opacity 0.15s;
+  /* Ambient background blobs */
+  .ambient {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none; z-index: 0; overflow: hidden;
   }
-  .cat-card:active { opacity: 0.7; }
-  .cat-left { display: flex; align-items: center; gap: 10px; }
-  .cat-icon { font-size: 22px; }
-  .cat-name { font-size: 15px; font-weight: 600; }
-  .cat-count { color: var(--text3); font-size: 13px; }
+  .blob {
+    position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12;
+    animation: float 20s ease-in-out infinite;
+  }
+  .blob-1 { width: 300px; height: 300px; background: #6366F1; top: -80px; right: -60px; }
+  .blob-2 { width: 250px; height: 250px; background: #8B5CF6; bottom: 10%; left: -80px; animation-delay: -7s; }
+  .blob-3 { width: 200px; height: 200px; background: #3B82F6; top: 40%; right: -40px; animation-delay: -14s; }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+  }
 
-  /* Category detail view */
-  .view { display: none; }
+  .view { display: none; position: relative; z-index: 1; }
   .view.active { display: block; }
-  .back-btn {
-    background: none; border: none; color: var(--accent);
-    font-size: 14px; cursor: pointer; padding: 8px 0; margin-bottom: 12px;
-  }
-  .cat-header { text-align: center; margin-bottom: 20px; }
-  .cat-header-icon { font-size: 36px; }
-  .cat-header-name { font-size: 20px; font-weight: 700; margin-top: 4px; }
-  .cat-header-count { color: var(--text3); font-size: 13px; }
 
-  /* News Item */
+  /* Header */
+  .header {
+    padding: 60px 0 8px; position: sticky; top: 0; z-index: 10;
+    background: linear-gradient(to bottom, var(--bg) 60%, transparent);
+    padding-bottom: 20px;
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+  .logo { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { background: linear-gradient(135deg, #818CF8, #C084FC); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .header-date { color: var(--text3); font-size: 13px; font-weight: 500; }
+  .header-sub { color: var(--text3); font-size: 12px; margin-top: 2px; }
+
+  /* Bento Grid */
+  .bento { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .bento-card {
+    background: var(--surface); border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 16px; position: relative; overflow: hidden;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    transition: transform 0.2s, background 0.2s; cursor: pointer;
+  }
+  .bento-card:active { transform: scale(0.97); background: var(--surface-hover); }
+  .bento-wide { grid-column: 1 / -1; }
+  .bento-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  }
+
+  /* Highlight Card (wide) */
+  .hl-icon { font-size: 20px; margin-bottom: 10px; display: inline-block; }
+  .hl-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--accent); margin-bottom: 8px; text-transform: uppercase;
+  }
+  .hl-text { font-size: 15px; font-weight: 600; line-height: 1.5; color: var(--text); }
+
+  /* Stats mini cards */
+  .stat-number { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-size: 11px; color: var(--text3); font-weight: 500; }
+  .stat-glow {
+    position: absolute; width: 80px; height: 80px; border-radius: 50%;
+    filter: blur(30px); opacity: 0.2; top: -10px; right: -10px;
+  }
+
+  /* Donut Chart */
+  .donut-wrap { display: flex; align-items: center; gap: 14px; }
+  .donut-svg { width: 64px; height: 64px; flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 3px; }
+  .donut-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
+  .donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Bar Chart */
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 48px; margin-top: 10px; }
+  .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .bar {
+    width: 100%; border-radius: 4px 4px 2px 2px; min-height: 4px;
+    transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .bar-label { font-size: 9px; color: var(--text3); }
+
+  /* Category Grid */
+  .section-title {
+    font-size: 16px; font-weight: 700; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-line { flex: 1; height: 1px; background: var(--glass-border); }
+  .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .cat-tile {
+    background: var(--surface); border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 14px; cursor: pointer;
+    transition: transform 0.2s, background 0.2s; position: relative; overflow: hidden;
+  }
+  .cat-tile:active { transform: scale(0.97); background: var(--surface-hover); }
+  .cat-tile-icon { font-size: 28px; margin-bottom: 8px; }
+  .cat-tile-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .cat-tile-count { font-size: 11px; color: var(--text3); }
+  .cat-tile-bar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+
+  /* Back button */
+  .back-btn {
+    background: var(--surface); border: 1px solid var(--glass-border);
+    color: var(--text2); font-size: 13px; font-weight: 500; cursor: pointer;
+    padding: 8px 14px; border-radius: 20px; margin-bottom: 16px;
+    backdrop-filter: blur(10px); display: inline-flex; align-items: center; gap: 4px;
+  }
+  .back-btn:active { background: var(--surface-hover); }
+
+  /* Category detail header */
+  .cat-detail-header {
+    text-align: center; padding: 20px 0 24px;
+  }
+  .cat-detail-icon { font-size: 44px; margin-bottom: 6px; }
+  .cat-detail-name { font-size: 22px; font-weight: 800; }
+  .cat-detail-count { font-size: 13px; color: var(--text3); margin-top: 2px; }
+
+  /* News Card */
   .news-card {
-    background: var(--surface); border-radius: 12px;
-    padding: 16px; margin-bottom: 12px; cursor: pointer; transition: opacity 0.15s;
+    background: var(--surface); border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
+    cursor: pointer; transition: transform 0.2s, background 0.2s;
   }
-  .news-card:active { opacity: 0.7; }
-  .news-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .news-card:active { transform: scale(0.98); background: var(--surface-hover); }
+  .news-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .badge {
-    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+    letter-spacing: 0.3px;
   }
-  .badge-high { background: #EF444420; color: var(--red); }
-  .badge-medium { background: #F59E0B20; color: var(--amber); }
-  .badge-low { background: #6B728020; color: var(--text3); }
-  .news-source { color: var(--text3); font-size: 12px; }
-  .news-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
-  .news-summary { color: var(--text2); font-size: 13px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-  .tag { background: var(--surface2); color: var(--text3); font-size: 11px; padding: 3px 8px; border-radius: 12px; }
+  .badge-high { background: rgba(248,113,113,0.15); color: var(--red); }
+  .badge-medium { background: rgba(251,191,36,0.15); color: var(--amber); }
+  .badge-low { background: rgba(100,116,139,0.15); color: var(--text3); }
+  .news-source { color: var(--text3); font-size: 11px; font-weight: 500; }
+  .news-title { font-size: 14px; font-weight: 600; line-height: 1.45; margin-bottom: 8px; }
+  .news-summary {
+    color: var(--text2); font-size: 12px; line-height: 1.6;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .news-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .tag {
+    background: rgba(255,255,255,0.06); color: var(--text3);
+    font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: 500;
+  }
+  .news-arrow { color: var(--text3); font-size: 14px; }
+
+  /* Impact gauge */
+  .gauge-wrap { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .gauge-track { flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .gauge-fill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+  .gauge-text { font-size: 10px; color: var(--text3); font-weight: 600; white-space: nowrap; }
 
   /* Detail view */
-  .detail-impact { display: inline-block; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin-bottom: 12px; }
-  .detail-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 6px; }
-  .detail-source { color: var(--text3); font-size: 13px; margin-bottom: 20px; }
-  .detail-section { margin-bottom: 20px; }
-  .detail-label { color: var(--text3); font-size: 12px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 6px; }
-  .detail-body { color: var(--text2); font-size: 14px; line-height: 1.6; }
-  .pred-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
-  .pred-card {
-    background: var(--surface); border-radius: 12px; padding: 16px;
-    margin-bottom: 12px; border-left: 4px solid var(--blue);
-  }
-  .pred-card.long { border-left-color: var(--violet); }
-  .pred-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .pred-label { font-size: 13px; font-weight: 700; }
-  .pred-period { color: var(--text3); font-size: 12px; }
-  .pred-content { color: var(--text2); font-size: 14px; line-height: 1.6; }
-  .link-btn {
-    display: block; text-align: center; background: var(--accent);
-    color: #fff; border: none; border-radius: 12px; padding: 14px;
-    font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none;
-    margin-top: 8px;
-  }
+  .detail-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 8px; margin-bottom: 14px; }
+  .detail-title { font-size: 20px; font-weight: 800; line-height: 1.35; margin-bottom: 8px; letter-spacing: -0.3px; }
+  .detail-source { color: var(--text3); font-size: 13px; margin-bottom: 24px; font-weight: 500; }
 
-  .loading { text-align: center; padding: 60px 0; color: var(--text3); }
-  .error { text-align: center; padding: 60px 0; color: var(--red); }
+  .detail-section {
+    background: var(--surface); border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+  }
+  .detail-label {
+    font-size: 11px; font-weight: 700; color: var(--text3);
+    letter-spacing: 0.8px; margin-bottom: 8px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .detail-label-icon { font-size: 14px; }
+  .detail-body { color: var(--text2); font-size: 14px; line-height: 1.7; }
+
+  /* Prediction cards */
+  .pred-section { margin: 20px 0 16px; }
+  .pred-section-title {
+    font-size: 15px; font-weight: 700; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pred-card {
+    background: var(--surface); border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
+    position: relative; overflow: hidden;
+  }
+  .pred-card::before {
+    content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  }
+  .pred-card.short::before { background: linear-gradient(to bottom, var(--blue), var(--accent)); }
+  .pred-card.long::before { background: linear-gradient(to bottom, var(--violet), var(--rose)); }
+  .pred-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-left: 8px; }
+  .pred-label { font-size: 13px; font-weight: 700; }
+  .pred-period {
+    font-size: 10px; color: var(--text3); font-weight: 600;
+    background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 8px;
+  }
+  .pred-content { color: var(--text2); font-size: 13px; line-height: 1.65; padding-left: 8px; }
+
+  /* Trend arrow indicator */
+  .trend-indicator {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 8px;
+    margin-top: 10px; margin-left: 8px;
+  }
+  .trend-up { background: rgba(52,211,153,0.1); color: var(--emerald); }
+  .trend-stable { background: rgba(96,165,250,0.1); color: var(--blue); }
+
+  /* Link button */
+  .link-btn {
+    display: block; text-align: center; text-decoration: none;
+    background: linear-gradient(135deg, var(--accent2), #7C3AED);
+    color: #fff; border: none; border-radius: var(--radius); padding: 15px;
+    font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 16px;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+    transition: transform 0.15s;
+  }
+  .link-btn:active { transform: scale(0.97); }
+
+  .loading {
+    text-align: center; padding: 100px 0; color: var(--text3);
+    font-size: 14px;
+  }
+  .loading-spinner {
+    width: 32px; height: 32px; border: 3px solid var(--glass-border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error { text-align: center; padding: 100px 0; color: var(--red); font-size: 14px; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate { animation: fadeUp 0.4s ease-out both; }
+  .delay-1 { animation-delay: 0.05s; }
+  .delay-2 { animation-delay: 0.1s; }
+  .delay-3 { animation-delay: 0.15s; }
+  .delay-4 { animation-delay: 0.2s; }
+  .delay-5 { animation-delay: 0.25s; }
 </style>
 </head>
 <body>
 
+<div class="ambient">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
 <!-- Home -->
 <div id="home-view" class="view active">
-  <div id="home-content"></div>
+  <div class="page" id="home-content"></div>
 </div>
 
 <!-- Category -->
 <div id="cat-view" class="view">
-  <button class="back-btn" onclick="showHome()">&larr; ホーム</button>
-  <div id="cat-content"></div>
+  <div class="page" id="cat-content"></div>
 </div>
 
 <!-- Detail -->
 <div id="detail-view" class="view">
-  <button class="back-btn" onclick="showCategory(currentCatIndex)">&larr; 一覧に戻る</button>
-  <div id="detail-content"></div>
+  <div class="page" id="detail-content"></div>
 </div>
 
 <script>
@@ -130,125 +295,243 @@ let report = null;
 let currentCatIndex = 0;
 
 const COLORS = {
-  research: '#6366F1', business: '#F59E0B', regulation: '#EF4444',
-  tools: '#10B981', society: '#8B5CF6', market: '#3B82F6'
+  research: '#818CF8', business: '#FBBF24', regulation: '#F87171',
+  tools: '#34D399', society: '#A78BFA', market: '#60A5FA'
+};
+const CAT_LABELS = {
+  research: '研究', business: '企業', regulation: '規制',
+  tools: 'ツール', society: '社会', market: '市場'
 };
 const BADGE = {
   high: { label: '重要', cls: 'badge-high' },
   medium: { label: '注目', cls: 'badge-medium' },
   low: { label: '参考', cls: 'badge-low' }
 };
+const IMPACT_VAL = { high: 100, medium: 60, low: 30 };
+
+function switchView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+// SVG donut chart
+function buildDonut(categories) {
+  let high = 0, med = 0, low = 0;
+  categories.forEach(c => c.items.forEach(it => {
+    if (it.impact_level === 'high') high++;
+    else if (it.impact_level === 'medium') med++;
+    else low++;
+  }));
+  const total = high + med + low || 1;
+  const r = 24, cx = 32, cy = 32, circum = 2 * Math.PI * r;
+  const segments = [
+    { pct: high / total, color: 'var(--red)' },
+    { pct: med / total, color: 'var(--amber)' },
+    { pct: low / total, color: 'var(--text3)' },
+  ];
+  let offset = 0;
+  let circles = '';
+  segments.forEach(s => {
+    circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="7"
+      stroke-dasharray="${s.pct * circum} ${circum}" stroke-dashoffset="${-offset}" opacity="0.85"/>`;
+    offset += s.pct * circum;
+  });
+  return `
+    <div class="donut-wrap">
+      <svg class="donut-svg" viewBox="0 0 64 64">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="7"/>
+        ${circles}
+      </svg>
+      <div class="donut-legend">
+        <div class="donut-item"><span class="donut-dot" style="background:var(--red)"></span>重要 ${high}件</div>
+        <div class="donut-item"><span class="donut-dot" style="background:var(--amber)"></span>注目 ${med}件</div>
+        <div class="donut-item"><span class="donut-dot" style="background:var(--text3)"></span>参考 ${low}件</div>
+      </div>
+    </div>`;
+}
+
+// Bar chart
+function buildBarChart(categories) {
+  const max = Math.max(...categories.map(c => c.items.length), 1);
+  return `<div class="bar-chart">${categories.map(c => {
+    const h = (c.items.length / max) * 40 + 4;
+    const color = COLORS[c.id] || '#6B7280';
+    return `<div class="bar-col">
+      <div class="bar" style="height:${h}px;background:${color}"></div>
+      <span class="bar-label">${c.icon}</span>
+    </div>`;
+  }).join('')}</div>`;
+}
 
 async function init() {
   const home = document.getElementById('home-content');
-  home.innerHTML = '<div class="loading">読み込み中...</div>';
+  home.innerHTML = '<div class="loading"><div class="loading-spinner"></div>読み込み中...</div>';
   try {
     const idx = await (await fetch(`${BASE}/index.json`)).json();
     const latest = idx.reports[idx.reports.length - 1];
     report = await (await fetch(`${BASE}/${latest.file}`)).json();
     renderHome();
   } catch (e) {
-    home.innerHTML = `<div class="error">データの取得に失敗しました</div>`;
+    home.innerHTML = '<div class="error">データの取得に失敗しました</div>';
   }
 }
 
 function renderHome() {
   const r = report;
+  const totalNews = r.categories.reduce((s, c) => s + c.items.length, 0);
+  const highCount = r.categories.reduce((s, c) => s + c.items.filter(i => i.impact_level === 'high').length, 0);
+
   let html = `
-    <div class="date">${r.date}</div>
-    <div class="highlight">
-      <div class="highlight-label">TODAY'S HIGHLIGHT</div>
-      <div class="highlight-text">${r.highlight}</div>
+    <div class="header animate">
+      <div class="header-top">
+        <div class="logo"><span>AI</span> Daily</div>
+        <div class="header-date">${r.date}</div>
+      </div>
+      <div class="header-sub">Powered by Claude</div>
     </div>
-    <div class="section-title">カテゴリ</div>
-  `;
+
+    <!-- Bento Grid -->
+    <div class="bento">
+      <!-- Highlight -->
+      <div class="bento-card bento-wide animate delay-1" onclick="void(0)">
+        <div class="hl-label">TODAY'S HIGHLIGHT</div>
+        <div class="hl-text">${r.highlight}</div>
+      </div>
+
+      <!-- Total News -->
+      <div class="bento-card animate delay-2">
+        <div class="stat-glow" style="background:var(--accent)"></div>
+        <div class="stat-number" style="background:linear-gradient(135deg,#818CF8,#C084FC);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${totalNews}</div>
+        <div class="stat-label">本日のニュース</div>
+        ${buildBarChart(r.categories)}
+      </div>
+
+      <!-- Impact donut -->
+      <div class="bento-card animate delay-3">
+        <div class="stat-number" style="color:var(--red)">${highCount}</div>
+        <div class="stat-label" style="margin-bottom:10px">重要ニュース</div>
+        ${buildDonut(r.categories)}
+      </div>
+    </div>
+
+    <!-- Category Grid -->
+    <div class="section-title animate delay-4">カテゴリ <div class="section-line"></div></div>
+    <div class="cat-grid">`;
+
   r.categories.forEach((cat, i) => {
     const color = COLORS[cat.id] || '#6B7280';
     html += `
-      <div class="cat-card" style="border-left-color:${color}" onclick="showCategory(${i})">
-        <div class="cat-left">
-          <span class="cat-icon">${cat.icon}</span>
-          <span class="cat-name">${cat.name}</span>
-        </div>
-        <span class="cat-count">${cat.items.length}件</span>
+      <div class="cat-tile animate delay-${Math.min(i + 3, 5)}" onclick="showCategory(${i})">
+        <div class="cat-tile-icon">${cat.icon}</div>
+        <div class="cat-tile-name">${cat.name}</div>
+        <div class="cat-tile-count">${cat.items.length}件</div>
+        <div class="cat-tile-bar" style="background:linear-gradient(90deg,${color},transparent)"></div>
       </div>`;
   });
-  document.getElementById('home-content').innerHTML = html;
-}
 
-function showHome() {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('home-view').classList.add('active');
-  window.scrollTo(0, 0);
+  html += '</div>';
+  document.getElementById('home-content').innerHTML = html;
 }
 
 function showCategory(idx) {
   currentCatIndex = idx;
   const cat = report.categories[idx];
   const color = COLORS[cat.id] || '#6B7280';
+
   let html = `
-    <div class="cat-header">
-      <div class="cat-header-icon">${cat.icon}</div>
-      <div class="cat-header-name" style="color:${color}">${cat.name}</div>
-      <div class="cat-header-count">${cat.items.length}件のニュース</div>
-    </div>`;
+    <div style="padding-top:54px">
+      <button class="back-btn animate" onclick="switchView('home-view')">← ホーム</button>
+      <div class="cat-detail-header animate delay-1">
+        <div class="cat-detail-icon">${cat.icon}</div>
+        <div class="cat-detail-name" style="color:${color}">${cat.name}</div>
+        <div class="cat-detail-count">${cat.items.length}件のニュース</div>
+      </div>`;
+
   cat.items.forEach((item, i) => {
     const b = BADGE[item.impact_level] || BADGE.low;
+    const gaugeW = IMPACT_VAL[item.impact_level] || 30;
+    const gaugeColor = item.impact_level === 'high' ? 'var(--red)' : item.impact_level === 'medium' ? 'var(--amber)' : 'var(--text3)';
     html += `
-      <div class="news-card" onclick="showDetail(${idx},${i})">
-        <div class="news-top">
+      <div class="news-card animate delay-${Math.min(i + 2, 5)}" onclick="showDetail(${idx},${i})">
+        <div class="news-meta">
           <span class="badge ${b.cls}">${b.label}</span>
           <span class="news-source">${item.source}</span>
         </div>
         <div class="news-title">${item.title}</div>
         <div class="news-summary">${item.summary}</div>
-        <div class="tags">${item.tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="gauge-wrap">
+          <div class="gauge-track"><div class="gauge-fill" style="width:${gaugeW}%;background:${gaugeColor}"></div></div>
+          <span class="gauge-text">Impact</span>
+        </div>
+        <div class="news-footer">
+          <div class="tags">${item.tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          <span class="news-arrow">→</span>
+        </div>
       </div>`;
   });
+
+  html += '</div>';
   document.getElementById('cat-content').innerHTML = html;
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('cat-view').classList.add('active');
-  window.scrollTo(0, 0);
+  switchView('cat-view');
 }
 
 function showDetail(catIdx, itemIdx) {
   currentCatIndex = catIdx;
   const item = report.categories[catIdx].items[itemIdx];
   const b = BADGE[item.impact_level] || BADGE.low;
+  const impactLabel = item.impact_level === 'high' ? '重要度: 高' : item.impact_level === 'medium' ? '重要度: 中' : '重要度: 低';
+
   const html = `
-    <div class="detail-impact ${b.cls}">${b.label === '重要' ? '重要度: 高' : b.label === '注目' ? '重要度: 中' : '重要度: 低'}</div>
-    <div class="detail-title">${item.title}</div>
-    <div class="detail-source">${item.source}</div>
-    <div class="detail-section">
-      <div class="detail-label">概要</div>
-      <div class="detail-body">${item.summary}</div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-label">背景・経緯</div>
-      <div class="detail-body">${item.background}</div>
-    </div>
-    <div class="pred-title">トレンド予測</div>
-    <div class="pred-card">
-      <div class="pred-header">
-        <span class="pred-label" style="color:var(--blue)">短期予測</span>
-        <span class="pred-period">1〜3ヶ月</span>
+    <div style="padding-top:54px">
+      <button class="back-btn animate" onclick="showCategory(${catIdx})">← 一覧に戻る</button>
+
+      <div class="animate delay-1">
+        <div class="detail-badge ${b.cls}">${impactLabel}</div>
+        <div class="detail-title">${item.title}</div>
+        <div class="detail-source">${item.source}</div>
       </div>
-      <div class="pred-content">${item.prediction_short}</div>
-    </div>
-    <div class="pred-card long">
-      <div class="pred-header">
-        <span class="pred-label" style="color:var(--violet)">中長期予測</span>
-        <span class="pred-period">半年〜1年</span>
+
+      <div class="detail-section animate delay-2">
+        <div class="detail-label"><span class="detail-label-icon">📋</span> 概要</div>
+        <div class="detail-body">${item.summary}</div>
       </div>
-      <div class="pred-content">${item.prediction_long}</div>
-    </div>
-    <div class="tags" style="margin-bottom:20px">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-    <a class="link-btn" href="${item.url}" target="_blank" rel="noopener">元記事を開く</a>
-  `;
+
+      <div class="detail-section animate delay-3">
+        <div class="detail-label"><span class="detail-label-icon">📖</span> 背景・経緯</div>
+        <div class="detail-body">${item.background}</div>
+      </div>
+
+      <div class="pred-section animate delay-4">
+        <div class="pred-section-title">📈 トレンド予測</div>
+
+        <div class="pred-card short">
+          <div class="pred-top">
+            <span class="pred-label" style="color:var(--blue)">短期予測</span>
+            <span class="pred-period">1〜3ヶ月</span>
+          </div>
+          <div class="pred-content">${item.prediction_short}</div>
+          <div class="trend-indicator trend-up">↑ 加速傾向</div>
+        </div>
+
+        <div class="pred-card long">
+          <div class="pred-top">
+            <span class="pred-label" style="color:var(--violet)">中長期予測</span>
+            <span class="pred-period">半年〜1年</span>
+          </div>
+          <div class="pred-content">${item.prediction_long}</div>
+          <div class="trend-indicator trend-stable">→ 構造的変化</div>
+        </div>
+      </div>
+
+      <div class="animate delay-5">
+        <div class="tags" style="margin-bottom:16px">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <a class="link-btn" href="${item.url}" target="_blank" rel="noopener">元記事を開く →</a>
+      </div>
+    </div>`;
+
   document.getElementById('detail-content').innerHTML = html;
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('detail-view').classList.add('active');
-  window.scrollTo(0, 0);
+  switchView('detail-view');
 }
 
 init();
