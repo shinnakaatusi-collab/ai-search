@@ -368,9 +368,10 @@ async function init() {
   const home = document.getElementById('home-content');
   home.innerHTML = '<div class="loading"><div class="loading-spinner"></div>読み込み中...</div>';
   try {
-    const idx = await (await fetch(`${BASE}/index.json`)).json();
+    const t = Date.now();
+    const idx = await (await fetch(`${BASE}/index.json?t=${t}`)).json();
     const latest = idx.reports[idx.reports.length - 1];
-    report = await (await fetch(`${BASE}/${latest.file}`)).json();
+    report = await (await fetch(`${BASE}/${latest.file}?t=${t}`)).json();
     renderHome();
   } catch (e) {
     home.innerHTML = '<div class="error">データの取得に失敗しました</div>';
