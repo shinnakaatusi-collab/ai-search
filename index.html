@@ -370,7 +370,7 @@ async function init() {
   try {
     const t = Date.now();
     const idx = await (await fetch(`${BASE}/index.json?t=${t}`)).json();
-    const latest = idx.reports[idx.reports.length - 1];
+    const latest = idx.reports[0];
     report = await (await fetch(`${BASE}/${latest.file}?t=${t}`)).json();
     renderHome();
   } catch (e) {
