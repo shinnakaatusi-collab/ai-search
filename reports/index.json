@@ -1,9 +1,13 @@
 {
   "reports": [
     {
+      "date": "2026-04-16",
+      "file": "2026-04-16_ai-daily-report.json"
+    },
+    {
       "date": "2026-04-15",
       "file": "2026-04-15_ai-daily-report.json"
     }
   ],
-  "last_updated": "2026-04-15T00:00:00+09:00"
+  "last_updated": "2026-04-16T10:00:00+09:00"
 }
